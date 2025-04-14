@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -40,6 +41,29 @@ public class PeliculaController {
         // de lo contrario se envuelve el objeto en ResponseWrapper.
         Pelicula pelicula = peliculaService.obtenerPorId(id);
         ResponseWrapper<Pelicula> response = new ResponseWrapper<>("OK", 1, pelicula);
+        return ResponseEntity.ok(response);
+    }
+
+    // Endpoint para crear una nueva película
+    @PostMapping
+    public ResponseEntity<?> crear(@RequestBody Pelicula pelicula) {
+        // Aquí se guarda la película en la base de datos
+        Pelicula peliculaGuardada = peliculaService.guardar(pelicula);
+        ResponseWrapper<Pelicula> response = new ResponseWrapper<>("OK", 1, peliculaGuardada);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody @Valid Pelicula pelicula) {
+        Pelicula peliculaActualizada = peliculaService.actualizar(id, pelicula);
+        ResponseWrapper<Pelicula> response = new ResponseWrapper<>("OK", 1, peliculaActualizada);
+        return ResponseEntity.ok(response);
+    }
+    
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminar(@PathVariable Long id) {
+        peliculaService.eliminar(id);
+        ResponseWrapper<String> response = new ResponseWrapper<>("OK", 0, "La película ha sido eliminada correctamente");
         return ResponseEntity.ok(response);
     }
 }
